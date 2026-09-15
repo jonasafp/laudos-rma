@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D4976">
+<title>Laudos RMA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <button class="back hidden" id="btnBack" aria-label="Voltar">←</button>
+    <div class="topbar-title">
+      <h1 id="pageTitle">Laudos RMA</h1>
+      <span class="sub" id="pageSub">carregando…</span>
+    </div>
+    <button class="refresh" id="btnRefresh" title="Atualizar" aria-label="Atualizar">⟳</button>
+  </header>
+
+  <div id="panes">
+
+    <!-- ========== PAINEL DA LISTA (sempre visível no desktop) ========== -->
+    <aside id="listPane">
+      <div class="pane-head">
+        <h2>Laudos</h2>
+        <button class="btn btn-accent btn-sm" id="btnNewLaudo">+ Novo</button>
+      </div>
+      <div class="banner" id="sharedBanner">
+        Estes laudos ficam salvos em um espaço <strong>compartilhado</strong>: qualquer pessoa com este link vê e edita os mesmos registros, de qualquer aparelho.
+      </div>
+      <div id="listContainer"><div class="loading-row"><div class="spinner"></div> Carregando laudos…</div></div>
+    </aside>
+
+    <!-- ========== PAINEL DO FORMULÁRIO / DETALHE ========== -->
+    <section id="formPane" class="hidden">
+      <div class="form-pane-inner">
+
+        <div id="formEmptyState" class="empty-state form-empty">
+          <div class="tag-icon">L</div>
+          <p><strong>Nenhum laudo selecionado.</strong></p>
+          <p>Escolha um laudo na lista ou crie um novo para começar.</p>
+        </div>
+
+        <div id="viewForm" class="hidden">
+
+          <div class="section-label">Dados do cliente</div>
+          <div class="field"><label>Cliente <span class="req">*</span></label><input type="text" id="f_cliente" list="dl_cliente" placeholder="Nome / razão social"></div>
+          <div class="field"><label>Endereço <span class="opt">(opcional)</span></label><input type="text" id="f_endereco" list="dl_endereco" placeholder="Rua, número"></div>
+          <div class="row2">
+            <div class="field"><label>Bairro <span class="opt">(opcional)</span></label><input type="text" id="f_bairro" list="dl_bairro"></div>
+            <div class="field"><label>Cidade <span class="opt">(opcional)</span></label><input type="text" id="f_cidade" list="dl_cidade"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>UF <span class="opt">(opcional)</span></label><input type="text" id="f_uf" list="dl_uf" maxlength="2" style="text-transform:uppercase"></div>
+            <div class="field"><label>Telefone <span class="req">*</span></label><input type="tel" id="f_telefone" list="dl_telefone" placeholder="(00) 00000-0000"></div>
+          </div>
+
+          <div class="section-label">Responsáveis e envio</div>
+          <div class="field"><label>Responsável pelo envio <span class="req">*</span></label><input type="text" id="f_respEnvio" list="dl_respEnvio"></div>
+          <div class="field"><label>Responsável pelo laudo <span class="opt">(opcional)</span></label><input type="text" id="f_respLaudo" list="dl_respLaudo"></div>
+          <div class="field"><label>E-mail <span class="req">*</span></label><input type="email" id="f_email" list="dl_email"></div>
+          <div class="field"><label>Whatsapp <span class="opt">(opcional)</span></label><input type="tel" id="f_whatsapp" list="dl_whatsapp"></div>
+          <div class="row2">
+            <div class="field"><label>Nº da NF <span class="req">*</span></label><input type="text" id="f_nf"></div>
+            <div class="field"><label>Data <span class="req">*</span></label><input type="date" id="f_data"></div>
+          </div>
+
+          <div class="section-label">
+            <span>Itens do laudo</span>
+            <span id="itemCountLabel" class="count-label"></span>
+          </div>
+          <p class="req-note">Cada item deve estar identificado com uma etiqueta no equipamento correspondente ao número abaixo.</p>
+
+          <div id="itemsContainer"></div>
+          <button class="btn btn-ghost-full" id="btnAddItem" type="button">+ Adicionar item</button>
+
+          <div class="section-label" style="margin-top:26px;">Exportar</div>
+          <button class="btn btn-accent" id="btnExportPdf" type="button" style="width:100%;">⬇ Gerar PDF do laudo</button>
+          <p class="export-note">Abre a janela de impressão do navegador — escolha "Salvar como PDF" como destino.</p>
+
+          <div style="margin-top:26px;text-align:center;">
+            <button class="btn-danger-text" id="btnDeleteLaudo">Excluir este laudo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fab-row hidden" id="fabRow">
+        <button class="btn btn-primary" id="btnSaveLaudo">Salvar laudo</button>
+      </div>
+    </section>
+
+  </div>
+
+</div>
+
+<!-- Datalists para sugestões (preenchidas via JS a partir do armazenamento compartilhado) -->
+<datalist id="dl_cliente"></datalist>
+<datalist id="dl_endereco"></datalist>
+<datalist id="dl_bairro"></datalist>
+<datalist id="dl_cidade"></datalist>
+<datalist id="dl_uf"></datalist>
+<datalist id="dl_telefone"></datalist>
+<datalist id="dl_respEnvio"></datalist>
+<datalist id="dl_respLaudo"></datalist>
+<datalist id="dl_email"></datalist>
+<datalist id="dl_whatsapp"></datalist>
+<datalist id="dl_produto"></datalist>
+
+<div class="modal-backdrop hidden" id="itemModal">
+  <div class="modal-sheet">
+    <h2 id="itemModalTitle">Novo item</h2>
+    <div class="row3">
+      <div class="field"><label>Item / OS <span class="req">*</span></label><input type="text" id="m_itemOS"></div>
+      <div class="field" style="grid-column:span 2;"><label>Produto <span class="req">*</span></label><input type="text" id="m_produto" list="dl_produto" placeholder="Ex: Central (WNITRO)"></div>
+    </div>
+    <div class="field"><label>Fabricação <span class="opt">(opcional)</span></label><input type="date" id="m_fabricacao"></div>
+    <div class="field"><label>Descrição do problema <span class="req">*</span></label>
+      <textarea id="m_descricao" placeholder="Período de funcionamento, voltagem, relato do cliente, se é intermitente..."></textarea>
+    </div>
+    <div class="field">
+      <label>Situação <span class="req">*</span></label>
+      <div class="situ-choice">
+        <label class="troca"><input type="radio" name="m_situacao" value="troca" checked><span>TROCA</span></label>
+        <label class="cliente"><input type="radio" name="m_situacao" value="cliente"><span>CLIENTE</span></label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelItem" type="button">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveItem" type="button">Salvar item</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="printArea"></div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
