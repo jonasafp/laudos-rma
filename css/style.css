@@ -1,0 +1,367 @@
+/* =========================================================================
+   LAUDOS RMA — folha de estilos
+   Blocos: 1) tokens  2) base/reset  3) app shell (header + painéis)
+           4) lista  5) formulário  6) itens  7) modal  8) toast
+           9) responsivo (celular vs tablet/desktop)  10) PDF/impressão
+   ========================================================================= */
+
+/* ---------- 1) Tokens ---------- */
+:root {
+  --navy: #1D4976;
+  --navy-deep: #153A61;
+  --navy-ink: #1B1F1D;
+  --paper: #EDEFEA;
+  --paper-raised: #FFFFFF;
+  --card-bg: #F4F9FD;
+  --line: #CFCABC;
+  --line-soft: #E2DFD3;
+  --lbl-bg: #DDEAF8;
+  --border-blue: #AFCBE7;
+  --grid-line: #E1EDF8;
+  --teal: #2F6F62;
+  --danger: #B5432E;
+  --muted: #6B6E64;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---------- 2) Base / reset ---------- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--navy-ink);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden; /* o scroll acontece dentro dos painéis, não na página */
+}
+button { font: inherit; }
+
+/* ---------- 3) App shell ---------- */
+#app {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+header.topbar {
+  flex-shrink: 0;
+  background: var(--navy-ink);
+  color: var(--paper);
+  padding: calc(env(safe-area-inset-top) + 14px) 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+header.topbar .back {
+  background: none; border: none; color: #7FC4E8; font-family: var(--font-mono);
+  font-size: 15px; padding: 6px 8px 6px 0; cursor: pointer; display: flex; align-items: center; gap: 4px;
+}
+.topbar-title { flex: 1; min-width: 0; }
+header.topbar h1 {
+  font-family: var(--font-head); font-weight: 600; font-size: 18px; margin: 0;
+  letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+header.topbar .sub { font-family: var(--font-mono); font-size: 12px; color: #B9BCB2; display: block; margin-top: 2px; }
+header.topbar .refresh { background: none; border: none; color: #7FC4E8; font-size: 19px; padding: 6px; cursor: pointer; flex-shrink: 0; }
+
+#panes {
+  flex: 1;
+  display: flex;
+  min-height: 0; /* essencial para os filhos conseguirem ter scroll próprio */
+  overflow: hidden;
+}
+
+#listPane, #formPane {
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#listPane {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  padding: 14px 16px 24px;
+}
+#formPane {
+  width: 100%;
+  background: var(--paper-raised);
+  display: flex;
+  flex-direction: column;
+}
+.form-pane-inner { padding: 16px 16px 24px; }
+
+.pane-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.pane-head h2 {
+  font-family: var(--font-head); font-size: 15px; font-weight: 600; margin: 0; color: var(--navy-ink);
+}
+
+/* ---------- 4) Lista ---------- */
+.banner {
+  background: #FBEFDA; border: 1px solid #E4D3AE; color: #5C3D06; border-radius: 10px;
+  padding: 12px 14px; font-size: 12.5px; margin-bottom: 14px; line-height: 1.4;
+}
+.loading-row { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--navy); animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-state .tag-icon {
+  width: 56px; height: 56px; margin: 0 auto 14px; border: 2px dashed var(--line); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 22px; color: var(--line);
+}
+.empty-state p { margin: 4px 0; font-size: 14px; }
+.form-empty { padding-top: 80px; }
+
+.laudo-card {
+  background: var(--paper-raised); border: 1px solid var(--line-soft); border-radius: var(--radius);
+  padding: 14px 14px 14px 16px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: box-shadow .16s ease, border-color .16s ease, transform .16s ease;
+}
+.laudo-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--navy); }
+.laudo-card.active { border-color: var(--navy); background: #F3F8FC; }
+.laudo-card .lc-main { flex: 1; min-width: 0; }
+.laudo-card .lc-cliente {
+  font-family: var(--font-head); font-weight: 600; font-size: 15.5px; margin: 0 0 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.laudo-card .lc-meta { font-size: 12.5px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.laudo-card .lc-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.laudo-card .lc-count {
+  font-family: var(--font-mono); font-size: 12px; background: var(--paper); border: 1px solid var(--line-soft);
+  border-radius: 20px; padding: 3px 9px; color: var(--navy-ink); white-space: nowrap; align-self: center;
+}
+.laudo-card .lc-del { background: none; border: none; color: var(--muted); font-size: 18px; padding: 2px 4px; cursor: pointer; line-height: 1; }
+
+/* ---------- 5) Formulário ---------- */
+.section-label {
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.03em; color: var(--muted);
+  margin: 22px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-label:first-child { margin-top: 0; }
+.req-note { font-size: 11px; color: var(--muted); margin: 2px 0 14px; }
+.count-label { font-weight: 600; color: var(--navy-ink); }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--navy-ink); margin-bottom: 5px; }
+.field label .opt { color: var(--muted); font-weight: 400; }
+.field label .req { color: var(--danger); }
+.field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date],
+.field textarea, .field select {
+  width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper-raised); font-size: 15px; color: var(--navy-ink); font-family: var(--font-body);
+  transition: border-color .14s ease, box-shadow .14s ease;
+}
+.field textarea { resize: vertical; min-height: 64px; }
+.field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid var(--navy); outline-offset: 0; border-color: var(--navy); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 0.7fr; gap: 10px; }
+
+.btn {
+  font-family: var(--font-body); font-weight: 600; font-size: 14.5px; border-radius: 8px; padding: 12px 16px;
+  border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  transition: transform .14s ease, box-shadow .14s ease, background-color .14s ease, border-color .14s ease;
+}
+.btn[disabled] { opacity: .55; pointer-events: none; }
+.btn-primary { background: var(--navy-ink); color: var(--paper); width: 100%; }
+.btn-primary:active { background: #333831; }
+.btn-accent { background: var(--navy); color: #fff; }
+.btn-accent:active { background: var(--navy-deep); }
+.btn-ghost { background: none; border: 1px solid var(--line); color: var(--navy-ink); }
+.btn-ghost-full { background: none; border: 1px dashed var(--line); color: var(--muted); width: 100%; padding: 12px; }
+.btn-danger-text { background: none; border: none; color: var(--danger); font-weight: 600; font-size: 13.5px; padding: 8px; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+
+.fab-row {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
+  background: var(--paper-raised);
+  border-top: 1px solid var(--line-soft);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.export-note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.no-items-note { font-size: 13px; color: var(--muted); margin: 6px 0 14px; }
+
+/* ---------- 6) Itens ---------- */
+.item-ticket {
+  background: var(--paper-raised); border: 1px solid var(--line-soft); border-radius: var(--radius);
+  display: flex; margin-bottom: 10px; overflow: hidden;
+  transition: box-shadow .16s ease;
+}
+.item-ticket .it-num {
+  font-family: var(--font-mono); font-weight: 600; font-size: 16px; color: var(--navy); background: #E5F1F8;
+  width: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-right: 1px dashed var(--line);
+}
+.item-ticket .it-body { flex: 1; padding: 11px 12px; min-width: 0; }
+.item-ticket .it-produto { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; }
+.item-ticket .it-fab { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin: 0 0 6px; }
+.item-ticket .it-desc { font-size: 13px; color: #3A3D37; margin: 0 0 6px; line-height: 1.4; }
+.item-ticket .it-tags { display: flex; gap: 6px; align-items: center; }
+.pill { font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--line); }
+.pill.troca { background: #EAF2EF; color: var(--teal); border-color: #BFDBD3; }
+.pill.cliente { background: #E5F1F8; color: var(--navy); border-color: #BEDFF4; }
+.item-ticket .it-actions { display: flex; flex-direction: column; border-left: 1px solid var(--line-soft); }
+.item-ticket .it-actions button {
+  flex: 1; border: none; background: none; padding: 0 12px; font-size: 13px; color: var(--muted);
+  cursor: pointer; border-bottom: 1px solid var(--line-soft);
+}
+.item-ticket .it-actions button:last-child { border-bottom: none; color: var(--danger); }
+
+/* ---------- 7) Modal ---------- */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(27,31,29,0.55); z-index: 50; display: flex; align-items: flex-end; }
+.modal-sheet {
+  background: var(--paper); width: 100%; max-width: 640px; margin: 0 auto; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  max-height: 92vh; overflow-y: auto; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); animation: slideUp .18s ease-out;
+}
+@keyframes slideUp { from { transform: translateY(24px); opacity: 0.4; } to { transform: translateY(0); opacity: 1; } }
+.modal-sheet h2 { font-family: var(--font-head); font-size: 17px; margin: 0 0 16px; }
+.situ-choice { display: flex; gap: 10px; margin-bottom: 6px; }
+.situ-choice label {
+  flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: 11px; text-align: center;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--muted);
+}
+.situ-choice input { display: none; }
+.situ-choice label:has(input:checked).troca { background: #EAF2EF; border-color: var(--teal); color: var(--teal); }
+.situ-choice label:has(input:checked).cliente { background: #E5F1F8; border-color: var(--navy); color: var(--navy); }
+.modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+.modal-actions .btn { flex: 1; }
+
+/* ---------- 8) Toast ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+  background: var(--navy-ink); color: var(--paper); padding: 11px 18px; border-radius: 24px; font-size: 13.5px;
+  opacity: 0; transition: all .2s ease; pointer-events: none; z-index: 100; max-width: 88%; text-align: center;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- 9) Responsivo ---------- */
+.hidden { display: none !important; }
+
+/* Celular (padrão): só um painel por vez, decidido pela classe .hidden via JS */
+
+@media (min-width: 720px) {
+  /* Nesta largura os dois painéis ficam lado a lado sempre — a classe
+     .hidden aplicada pelo JS (pensada para o celular) é ignorada aqui
+     por causa da especificidade mais alta destes seletores. */
+  #listPane.hidden, #formPane.hidden { display: flex !important; }
+
+  header.topbar .back { display: none !important; }
+
+  #panes { flex-direction: row; }
+  #listPane {
+    width: 280px; flex-shrink: 0;
+    border-right: 1px solid var(--line-soft);
+    padding: 18px 16px 24px;
+  }
+  #formPane { flex: 1; }
+  .form-pane-inner { padding: 20px 24px 24px; }
+
+  .row2, .row3 { gap: 14px; }
+
+  .modal-backdrop { align-items: center; padding: 20px; }
+  .modal-sheet { border-radius: var(--radius-lg); max-width: 480px; max-height: 86vh; animation: modalPop .16s ease-out; }
+  @keyframes modalPop { from { transform: scale(.97); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+}
+
+@media (min-width: 1024px) {
+  #listPane { width: 340px; padding: 20px 20px 24px; }
+  .form-pane-inner { padding: 28px 40px 28px; }
+}
+
+@media (min-width: 1280px) {
+  #listPane { width: 400px; }
+  .form-pane-inner { padding: 32px 56px 32px; }
+}
+
+/* Toques modernos: hover só em dispositivos com mouse de verdade */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: #2a2f28; }
+  .btn-accent:hover { background: var(--navy-deep); }
+  .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+  .laudo-card:hover { box-shadow: 0 8px 22px rgba(20,30,25,.1); border-color: var(--navy); transform: translateY(-1px); }
+  .item-ticket:hover { box-shadow: 0 6px 16px rgba(20,30,25,.08); }
+  .lc-del:hover { color: var(--danger); }
+}
+
+/* ---------- 10) PDF / impressão — recriação do modelo Rossi ---------- */
+#printArea { display: none; }
+.pdf-page {
+  width: 210mm; min-height: 297mm; margin: 0 auto; background: var(--card-bg);
+  padding: 9mm 10mm 12mm; color: var(--navy-deep); font-family: var(--font-body);
+}
+.pdf-header2 { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 5mm; }
+.pdf-logo-word { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; justify-content: center; }
+.pdf-logo-word .oval {
+  border: 3px solid var(--navy); border-radius: 50%; padding: 5px 16px; font-family: var(--font-head);
+  font-weight: 700; font-size: 20px; font-style: italic; color: var(--navy); letter-spacing: 0.5px; line-height: 1;
+}
+.pdf-logo-word .tag { font-family: var(--font-head); font-size: 8.5px; font-weight: 600; color: var(--navy); margin-top: 3px; letter-spacing: 0.02em; }
+.pdf-title-bar {
+  flex: 1; background: var(--navy); border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; min-height: 64px; padding: 6px 10px;
+}
+.pdf-title-bar span { color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 32px; letter-spacing: 1.5px; }
+
+.pdf-client-wrap { display: flex; gap: 9px; margin-bottom: 2.5mm; align-items: stretch; }
+.pdf-client-table { flex: 1; border: 1.4px solid var(--border-blue); border-radius: 10px; overflow: hidden; background: #fff; }
+.pdf-client-row { display: flex; border-bottom: 1px solid var(--grid-line); min-height: 26px; }
+.pdf-client-row:last-child { border-bottom: none; }
+.pdf-client-row .lbl {
+  width: 36%; background: var(--lbl-bg); padding: 6px 11px; font-weight: 700; font-size: 10px;
+  color: var(--navy-deep); display: flex; align-items: center; border-right: 1px solid var(--grid-line);
+}
+.pdf-client-row .val { flex: 1; padding: 6px 11px; font-size: 10.5px; color: #16314F; display: flex; align-items: center; word-break: break-word; }
+.pdf-side { width: 27%; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.pdf-date-box2 { border: 1.4px solid var(--border-blue); border-radius: 10px; padding: 9px 11px; background: #fff; }
+.pdf-date-box2 .dl { font-weight: 700; font-size: 9.5px; color: var(--navy-deep); }
+.pdf-date-box2 .dv { font-weight: 700; font-size: 12px; color: var(--navy-deep); margin-top: 5px; padding-left: 6px; }
+.pdf-nf-box2 { border: 1.4px solid var(--border-blue); border-radius: 10px; padding: 9px 11px; background: var(--lbl-bg); }
+.pdf-nf-box2 .dl { font-weight: 700; font-size: 9.5px; color: var(--navy-deep); }
+.pdf-nf-box2 .dv { font-weight: 700; font-size: 11.5px; color: var(--navy-deep); margin-top: 5px; }
+
+.pdf-req-line { font-size: 9px; color: #3c5a70; margin: 1.5mm 0 3mm 1px; }
+.pdf-banner { background: var(--lbl-bg); border-radius: 8px; text-align: center; padding: 6px 10px; font-size: 9.5px; font-weight: 700; color: var(--navy-deep); margin-bottom: 3mm; }
+
+.pdf-items-wrap { border: 1.4px solid var(--border-blue); border-radius: 10px; overflow: hidden; margin-bottom: 3mm; }
+table.pdf-table2 { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+table.pdf-table2 thead th {
+  background: var(--navy); color: #fff; padding: 7px 8px; font-weight: 700; font-size: 9.5px;
+  border-right: 1px solid rgba(255,255,255,.25); text-align: left;
+}
+table.pdf-table2 thead th:last-child { border-right: none; }
+table.pdf-table2 thead th.c-item { text-align: center; }
+table.pdf-table2 tbody td { padding: 8px 8px; border-top: 1px solid var(--grid-line); border-right: 1px solid var(--grid-line); vertical-align: middle; }
+table.pdf-table2 tbody td:last-child { border-right: none; }
+table.pdf-table2 tbody tr:nth-child(even) { background: #F3F9FD; }
+table.pdf-table2 tbody tr { page-break-inside: avoid; }
+.col-item2 { text-align: center; font-weight: 700; font-size: 14px; color: var(--navy); width: 9%; }
+.col-produto2 { width: 22%; font-size: 9.5px; line-height: 1.35; color: var(--navy-deep); }
+.col-desc2 { width: 46%; text-align: center; font-size: 9.5px; color: var(--navy-deep); }
+.col-situ2 { width: 23%; font-size: 9.5px; color: var(--navy-deep); }
+.situ-line2 { margin: 2px 0; font-weight: 400; letter-spacing: .01em; }
+
+.pdf-footer-wrap { border: 1.4px solid var(--border-blue); border-radius: 10px; overflow: hidden; }
+.pdf-footer-title2 { background: var(--navy); color: #fff; text-align: center; padding: 8px; font-weight: 700; font-size: 10.5px; }
+.pdf-footer-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; background: #fff; }
+.pdf-footer-cols > div { padding: 10px 13px; font-size: 8.6px; line-height: 1.42; color: #1C3A57; border-right: 1px solid var(--grid-line); }
+.pdf-footer-cols > div:last-child { border-right: none; }
+.pdf-footer-cols strong { font-weight: 700; }
+
+@media print {
+  @page { size: A4; margin: 0; }
+  body * { visibility: hidden; }
+  #printArea, #printArea * { visibility: visible; }
+  #printArea { display: block; position: absolute; left: 0; top: 0; }
+}
