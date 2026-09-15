@@ -27,7 +27,7 @@ window.LaudosPDF = (function () {
    * A imagem deve estar em:
    * /assets/rossi-logo-otimizada.webp
    */
-  var LOGO_PATH = "assets/rossi-logo-otimizada.webp";
+  var LOGO_PATH = "assets/rossi-logo.png";
 
 
   /**
